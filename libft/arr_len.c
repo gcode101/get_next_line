@@ -6,7 +6,7 @@
 /*   By: gcortina <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/10/29 13:55:39 by gcortina          #+#    #+#             */
-/*   Updated: 2016/10/29 13:58:57 by gcortina         ###   ########.fr       */
+/*   Updated: 2016/11/03 17:24:23 by gcortina         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ int		arr_len(char **arr)
 	int	i;
 
 	i = 0;
-	printf("arr[%d]: %s\n", i, arr[i]);
 	while (arr[i])
 		i++;
 	return (i);
