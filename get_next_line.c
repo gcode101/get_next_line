@@ -138,6 +138,8 @@ int			get_next_line(const int fd, char **line)
 		//printf("%s\n", "right before read");
 		while ((ret = read(fd, buf, BUFF_SIZE)))
 		{
+			if (!ft_strlen(buf))
+				return -1;
 			//printf("%s\n", "inside read");
 			buf[ret] = '\0';
 			//printf("buf: %s\n", buf);
