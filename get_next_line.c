@@ -13,112 +13,92 @@
 #include "get_next_line.h"
 #include <stdio.h>
 
-static int	has_newline(char *str)
-{
-	int	i;
-
-	i = 0;
-	if (!str)
-		return (0);
-	while (str[i])
-	{
-		if (str[i++] == '\n')
-				return (1);
-	}
-	return (0);
-}
-
 static void	check_buf(char **line, char *buf, char **piece_ofstr)
 {
-	int		i;
-	char	*substr;
 	char	*temp;
 
-	i = 0;
-	temp = *piece_ofstr;
 	//printf("%s\n", "Inside check_buf");
-	//printf("buf:\n%s\n", buf);
 	if (buf && ft_strlen(buf))
 	{
+		//printf("%s\n", "buf has something");
 		//printf("piece_ofstr: %s\n", *piece_ofstr);
-		while (temp && temp[i] && temp[i] != '\n')
-			i++;
-		if (ft_strlen(*line) == 0)
-			*line = ft_strjoin(*line, ft_strsub(temp, 0, i));
-		//printf("line: %s\n", *line);
-		i = 0;
-		while (buf[i] && buf[i] != '\n')
-			i++;
-		substr = ft_strsub(buf, 0, i);
-		//printf("substr: %s\n", substr);
-		*line = ft_strjoin(*line, substr);
-		//printf("line: %s\n", *line);
-	}
-	else
-	{
-		while (temp[i] && temp[i] != '\n')
-			i++;
-		substr = ft_strsub(temp, 0, i);
-		//printf("else substr: %s\n", substr);
-		*line = ft_strjoin(*line, substr);
-		//printf("else line: %s\n", *line);
-	}
-}
-
-static void	missing_str(char *buf, char **piece_ofstr)
-{
-	int		i;
-	int		j;
-	int		len;
-	char	*temp;
-
-	i = 0;
-	len = 0;
-	//printf("%s\n", "inside missing_str");
-	if (buf && ft_strlen(buf) && !(has_newline(*piece_ofstr)))
-	{
-		while (buf[i] && buf[i] != '\n')
-			i++;
-		j = i + 1;
-		while (buf[j++])
-			len++;
-		if (buf[i])
+		if (*piece_ofstr && (temp = ft_strchr(*piece_ofstr, '\n')) && ft_strlen(*line) == 0)
 		{
-			// free(*piece_ofstr);
-			*piece_ofstr = ft_strsub(buf, i + 1, len);
+			*temp = '\0';
+			//printf("piece_ofstr has newline and line is empty piece_ofstr: %s\n", *piece_ofstr);
+			*line = ft_strjoin(*line, *piece_ofstr);
+			//printf("line gets join with piece_ofstr line: %s\n", *line);
+			*piece_ofstr = ft_strdup(temp + 1);
+			//printf("piece_ofstr gets the rest piece_ofstr: %s\n", *piece_ofstr);
+			temp = NULL;
+			if (!ft_strlen(*piece_ofstr))
+			{
+				ft_memdel((void**)piece_ofstr);
+				//printf("piece_ofstr is empty so it gets free here piece_ofstr: %s\n", *piece_ofstr);
+			}
+		}
+		else if (ft_strlen(*line) == 0)
+		{
+			*line = ft_strjoin(*line, *piece_ofstr);
+			//printf("piece_ofstr doesnt have a newline so it joins line: %s\n", *line);
+			ft_memdel((void**)piece_ofstr);
+			//printf("piece_ofstr gets free here piece_ofstr: %s\n", *piece_ofstr);			
+		}
+		if ((temp = ft_strchr(buf, '\n')))
+		{
+			//printf("buf has a newline buf:\n%s\n", buf);
+			*temp = '\0';
+			*line = ft_strjoin(*line, buf);
+			//printf("buf joins line: %s\n", *line);
+			*piece_ofstr = ft_strdup(temp + 1);
+			//printf("piece_ofstr gets the rest of the buf piece_ofstr: %s\n", *piece_ofstr);
+			temp = NULL;
 			if (!ft_strlen(*piece_ofstr))
 			{
 				ft_memdel((void**)piece_ofstr);
 				//printf("piece_ofstr gets free here piece_ofstr: %s\n", *piece_ofstr);
 			}
 		}
-		//printf("piece_ofstr: %s\n", *piece_ofstr);
+		else
+		{
+			*line = ft_strjoin(*line, buf);
+			//printf("buf doesnt have a newline so joins line: %s\n", *line);
+		}
 	}
 	else
 	{
-		if (buf && ft_strlen(buf))
-			*piece_ofstr = ft_strjoin(*piece_ofstr, buf);
-		temp = *piece_ofstr;
-		while (temp[i] && temp[i] != '\n')
+		//printf("buf is empty buf: %s\n", buf);
+		if ((temp = ft_strchr(*piece_ofstr, '\n')))
 		{
-			i++;
+			//printf("piece_ofstr has newline piece_ofstr: %s\n", *piece_ofstr);
+			*temp = '\0';
+			*line = ft_strjoin(*line, *piece_ofstr);
+			//printf("piece_ofstr joins line: %s\n", *line);
+			*piece_ofstr = ft_strdup(temp + 1);
+			//printf("piece_ofstr gets the rest piece_ofstr: %s\n", *piece_ofstr);
+			temp = NULL;
+			if (!ft_strlen(*piece_ofstr))
+			{
+				ft_memdel((void**)piece_ofstr);
+				//printf("piece_ofstr gets free here piece_ofstr: %s\n", *piece_ofstr);
+			}
 		}
-		*piece_ofstr = &temp[i + 1];
-		//printf("else piece_ofstr: %s\n", *piece_ofstr);
-		if (buf && ft_strlen(buf) && !ft_strlen(*piece_ofstr))
+		else
 		{
+			*line = ft_strjoin(*line, *piece_ofstr);
+			//printf("piece_ofstr does not have newline piece_ofstr: %s\n", *piece_ofstr);
+			//printf("piece_ofstr joins line: %s\n", *line);
 			ft_memdel((void**)piece_ofstr);
-			//printf("piece_ofstr gets free here piece_ofstr: %s\n", *piece_ofstr);
+			//printf("piece_ofstr gets free here piece_ofstr: %s\n", *piece_ofstr);			
 		}		
 	}
-	// return (piece_ofstr);
 }
 
 int			get_next_line(const int fd, char **line)
 {
-	int			i;
 	int			ret;
 	char		*buf;
+	char		*temp;
 	static char	*piece_ofstr;
 
 	if (!line || !(*line = ft_strnew(1)))
@@ -141,28 +121,27 @@ int			get_next_line(const int fd, char **line)
 			if (!ft_strlen(buf))
 				return -1;
 			//printf("%s\n", "inside read");
+			//printf("ret: %d\n", ret);
 			buf[ret] = '\0';
 			//printf("buf: %s\n", buf);
-			if (has_newline(piece_ofstr))
-			{	
-				i = 0;
+			if (piece_ofstr && (temp = ft_strchr(piece_ofstr, '\n')))
+			{
+				*temp = '\0';	
 				//printf("%s\n", "piece_ofstr has newline");
-				while (piece_ofstr && piece_ofstr[i] != '\n')
-					i++;
-				*line = ft_strjoin(*line, ft_strsub(piece_ofstr, 0, i));
+				*line = ft_strjoin(*line, piece_ofstr);
 				//printf("line: %s\n", *line);
-				missing_str(buf, &piece_ofstr);
+				piece_ofstr = ft_strdup(temp + 1);
+				piece_ofstr = ft_strjoin(piece_ofstr, buf);
 				//printf("piece_ofstr: %s\n", piece_ofstr);
+				temp = NULL;
 				ft_memdel((void**)&buf);
 				//printf("buf gets free here buf: %s\n", buf);
 				return (1);
 			}			
-			else if (has_newline(buf))
+			else if (ft_strchr(buf, '\n'))
 			{
 				//printf("%s\n", "buf has newline");
 				check_buf(line, buf, &piece_ofstr);
-				missing_str(buf, &piece_ofstr);
-				//printf("%s\n", "after missing_str returns");
 				ft_memdel((void**)&buf);
 				//printf("buf gets free here buf: %s\n", buf);
 				return (1);
@@ -171,17 +150,14 @@ int			get_next_line(const int fd, char **line)
 			{
 				//printf("%s\n", "no newline in buf");
 				check_buf(line, buf, &piece_ofstr);
-				missing_str(buf, &piece_ofstr);
 			}
 		}
 		//printf("%s\n", "read is done");
-		// ft_memset(buf, '\0', ft_strlen(buf));
 		ft_memdel((void**)&buf);
 		//printf("buf gets free here buf: %s\n", buf);
 		if (piece_ofstr && ft_strlen(piece_ofstr))
 		{
 			check_buf(line, buf, &piece_ofstr);
-			missing_str(buf, &piece_ofstr);
 			//printf("line: %s\n", *line);
 			//printf("piece_ofstr: %s\n", piece_ofstr);
 			return (1);
