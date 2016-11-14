@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 
 static int	init_or_join(char **line, char **buf, char **piece_ofstr)
 {
